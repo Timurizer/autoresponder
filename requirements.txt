@@ -1,0 +1,13 @@
+pymorph
+pandas
+numpy
+nltk
+django
+djangorestframework
+django-rest-swagger
+gensim
+scipy
+psutil
+annoy
+pyTelegramBotApi
+vk_api
