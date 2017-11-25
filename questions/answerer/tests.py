@@ -56,9 +56,9 @@ class TestPreprocess(TestCase):
 
     def test_tokenize(self):
         tokenized = tokenize(self.my_string)
-        self.assertTrue(type(tokenized) is list)
-        self.assertTrue(len(tokenized) > 0)
-        self.assertTrue(type(tokenized[0]) is str)
+        self.assertTrue(type(tokenized) is list and
+                        len(tokenized) > 0 and
+                        type(tokenized[0]) is str)
 
     def test_lemmatize_text(self):
         tokenized_string = tokenize(self.my_string)
@@ -87,12 +87,15 @@ class TestAnswerer(TestCase):
     my_string = "Это моя тестовая строка"
     count = 3
 
-    def test_answer(self):
+    def test_answer_count(self):
         result = answer(self.my_string, self.count)
         self.assertTrue(len(result) == self.count)
-        self.assertTrue(type(result[0][0]) is str)
-        self.assertTrue(type(result[0][1]) is str)
-        self.assertTrue(type(result[0][2]) is float)
+
+    def test_answer_types(self):
+        result = answer(self.my_string, self.count)
+        self.assertTrue(type(result[0][0]) is str and
+                        type(result[0][1]) is str and
+                        type(result[0][2]) is float)
 
 
 class SQLiteTests(TestCase):
@@ -125,17 +128,23 @@ class SQLiteTests(TestCase):
                            quas)
         conn.commit()
 
-    def test_select(self):
+    def test_select1(self):
         conn = sqlite3.connect(self.dbpath)
         data = select_from_db(conn, 1)
         self.assertEqual(data[0], 'вопрос1')
+
+    def test_select2(self):
+        conn = sqlite3.connect(self.dbpath)
         data = select_from_db(conn, 4)
         self.assertEqual(data[1], 'ответ4')
 
-    def test_search(self):
+    def test_search1(self):
         conn = sqlite3.connect(self.dbpath)
         data = search_in_db(conn, 'вопрос1')
         self.assertEqual(data[1], 'ответ1')
+
+    def test_search2(self):
+        conn = sqlite3.connect(self.dbpath)
         data = search_in_db(conn, 'вопрос4')
         self.assertEqual(data[1], 'ответ4')
 
