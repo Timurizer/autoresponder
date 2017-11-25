@@ -100,11 +100,14 @@ class SQLiteTests(TestCase):
     Тесты работы с базой данных через sqlite3
     '''
 
+    dbpath = os.path.abspath(os.path.join(basepath, "..", "..", "test_database.db"))
+
     def setUp(self):
         """
         Создание тестовой базы данных и ее заполнение
         """
-        conn = sqlite3.connect("test_database.db")
+
+        conn = sqlite3.connect(self.dbpath)
         cursor = conn.cursor()
 
         cursor.execute("""CREATE TABLE answerer_question
@@ -123,21 +126,21 @@ class SQLiteTests(TestCase):
         conn.commit()
 
     def test_select(self):
-        conn = sqlite3.connect("test_database.db")
+        conn = sqlite3.connect(self.dbpath)
         data = select_from_db(conn, 1)
         self.assertEqual(data[0], 'вопрос1')
         data = select_from_db(conn, 4)
         self.assertEqual(data[1], 'ответ4')
 
     def test_search(self):
-        conn = sqlite3.connect("test_database.db")
+        conn = sqlite3.connect(self.dbpath)
         data = search_in_db(conn, 'вопрос1')
         self.assertEqual(data[1], 'ответ1')
         data = search_in_db(conn, 'вопрос4')
         self.assertEqual(data[1], 'ответ4')
 
     def test_insert(self):
-        conn = sqlite3.connect("test_database.db")
+        conn = sqlite3.connect(self.dbpath)
         insert_to_db(conn, 'новый вопрос', 'новый ответ')
         data = search_in_db(conn, 'новый вопрос')
         self.assertEqual(data[1], 'новый ответ')
@@ -146,8 +149,8 @@ class SQLiteTests(TestCase):
         """
         Удаление базы данных
         """
-        dbpath = os.path.abspath(os.path.join(basepath, "..", "..", "test_database.db"))
-        os.remove(dbpath)
+
+        os.remove(self.dbpath)
 
 
 class ModelCreationTest(TestCase):
@@ -163,12 +166,15 @@ class ModelCreationTest(TestCase):
             ('вопрос6', 'ответ6', 6),
             ]
 
+    dbpath = os.path.abspath(os.path.join(basepath, "..", "..", "test_model_database.db"))
+    model_name = os.path.abspath(os.path.join(basepath, "..", "..", "test_model"))
+
     def setUp(self):
         """
         Создание тестовой базы данных и ее заполнение
         Создание модели d2v с параметром iters=1 для скорости
         """
-        conn = sqlite3.connect("test_database.db")
+        conn = sqlite3.connect(self.dbpath)
         cursor = conn.cursor()
 
         cursor.execute("""CREATE TABLE answerer_questionpreprocessed
@@ -179,10 +185,10 @@ class ModelCreationTest(TestCase):
                            self.quas)
         conn.commit()
 
-        train_d2v("test_database.db", model_name="test_model", iters=1)
+        train_d2v(self.dbpath, model_name=self.model_name, iters=1)
 
     def test_model_creation(self):
-        model = models.Doc2Vec.load("test_model")
+        model = models.Doc2Vec.load(self.model_name)
         self.assertEqual(len(self.quas) * 2, len(model.docvecs))
 
     def tearDown(self):
@@ -190,7 +196,6 @@ class ModelCreationTest(TestCase):
         Удаление модели
         Удаление базы данных
         """
-        dbpath = os.path.abspath(os.path.join(basepath, "..", "..", "test_database.db"))
-        os.remove(dbpath)
-        model_name = os.path.abspath(os.path.join(basepath, "..", "..", "test_model"))
-        os.remove(model_name)
+
+        os.remove(self.dbpath)
+        os.remove(self.model_name)
