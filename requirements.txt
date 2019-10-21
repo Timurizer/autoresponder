@@ -19,7 +19,7 @@ itsdangerous==0.24
 itypes==1.1.0
 Jinja2==2.10
 MarkupSafe==1.0
-nltk==3.2.5
+nltk==3.4.5
 numpy==1.13.3
 openapi-codec==1.3.2
 pandas==0.21.0
